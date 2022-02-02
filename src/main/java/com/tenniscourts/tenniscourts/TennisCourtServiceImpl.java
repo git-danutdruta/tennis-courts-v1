@@ -36,6 +36,7 @@ public class TennisCourtServiceImpl implements TennisCourtService {
 
     @Override
     public TennisCourtDTO findTennisCourtWithSchedulesById(Long tennisCourtId) {
+        log.debug("[SERVICE] Find tennis court with schedules calendar filled");
         TennisCourtDTO tennisCourtDTO = findTennisCourtById(tennisCourtId);
         tennisCourtDTO.setTennisCourtSchedules(scheduleService.findSchedulesByTennisCourtId(tennisCourtId));
         return tennisCourtDTO;

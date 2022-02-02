@@ -1,6 +1,5 @@
 package com.tenniscourts.schedules;
 
-import com.tenniscourts.tenniscourts.TennisCourtDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,8 +12,6 @@ import java.time.LocalDateTime;
 public class ScheduleDTO {
 
     private Long id;
-
-    private TennisCourtDTO tennisCourt;
 
     @NotNull
     private Long tennisCourtId;
