@@ -2,13 +2,19 @@ package com.tenniscourts.schedules;
 
 import com.tenniscourts.config.BaseRestController;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+@Slf4j
+@RestController
+@RequestMapping("/schedule")
 @AllArgsConstructor
 public class ScheduleController extends BaseRestController {
 
@@ -16,7 +22,8 @@ public class ScheduleController extends BaseRestController {
 
     //TODO: implement rest and swagger
     public ResponseEntity<Void> addScheduleTennisCourt(CreateScheduleRequestDTO createScheduleRequestDTO) {
-        return ResponseEntity.created(locationByEntity(scheduleService.addSchedule(createScheduleRequestDTO.getTennisCourtId(), createScheduleRequestDTO).getId())).build();
+        log.info("[REST] Add schedule on tennis court [{}] starting on [{}]", createScheduleRequestDTO.getTennisCourtId(), createScheduleRequestDTO.getStartDateTime());
+        return ResponseEntity.created(locationByEntity(scheduleService.addSchedule(createScheduleRequestDTO).getId())).build();
     }
 
     //TODO: implement rest and swagger

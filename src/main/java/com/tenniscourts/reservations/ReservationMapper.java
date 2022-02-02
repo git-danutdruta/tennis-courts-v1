@@ -1,16 +1,12 @@
 package com.tenniscourts.reservations;
 
-import org.mapstruct.InheritInverseConfiguration;
+import com.tenniscourts.common.CommonMapper;
+import com.tenniscourts.common.config.CommonMapperConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
-public interface ReservationMapper {
-
-    Reservation map(ReservationDTO source);
-
-    @InheritInverseConfiguration
-    ReservationDTO map(Reservation source);
+@Mapper(config = CommonMapperConfiguration.class)
+public interface ReservationMapper extends CommonMapper<ReservationDTO, Reservation> {
 
     @Mapping(target = "guest.id", source = "guestId")
     @Mapping(target = "schedule.id", source = "scheduleId")

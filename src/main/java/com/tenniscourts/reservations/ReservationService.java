@@ -2,13 +2,17 @@ package com.tenniscourts.reservations;
 
 import com.tenniscourts.exceptions.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Slf4j
 @Service
+@Transactional
 @AllArgsConstructor
 public class ReservationService {
 
@@ -21,13 +25,16 @@ public class ReservationService {
     }
 
     public ReservationDTO findReservation(Long reservationId) {
-        return reservationRepository.findById(reservationId).map(reservationMapper::map).orElseThrow(() -> {
-            throw new EntityNotFoundException("Reservation not found.");
-        });
+        log.debug("[SERVICE] Find reservation by id: [{}]", reservationId);
+        return reservationRepository.findById(reservationId)
+                .map(reservationMapper::entityToDto)
+                .orElseThrow(() -> {
+                    throw new EntityNotFoundException("Reservation not found.");
+                });
     }
 
     public ReservationDTO cancelReservation(Long reservationId) {
-        return reservationMapper.map(this.cancel(reservationId));
+        return reservationMapper.entityToDto(this.cancel(reservationId));
     }
 
     private Reservation cancel(Long reservationId) {
@@ -87,7 +94,7 @@ public class ReservationService {
                 .guestId(previousReservation.getGuest().getId())
                 .scheduleId(scheduleId)
                 .build());
-        newReservation.setPreviousReservation(reservationMapper.map(previousReservation));
+        newReservation.setPreviousReservation(reservationMapper.entityToDto(previousReservation));
         return newReservation;
     }
 }
