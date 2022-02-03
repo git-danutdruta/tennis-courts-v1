@@ -1,12 +1,13 @@
 package com.tenniscourts.reservations;
 
 import com.tenniscourts.config.BaseRestController;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Slf4j
 @RestController
@@ -18,7 +19,7 @@ public class ReservationController extends BaseRestController {
 
     @ApiOperation("Book reservation")
     @PostMapping
-    public ResponseEntity<Void> bookReservation(@RequestBody CreateReservationRequestDTO createReservationRequestDTO) {
+    public ResponseEntity<Void> bookReservation(@Valid @RequestBody CreateReservationRequestDTO createReservationRequestDTO) {
         log.info("[REST] Book reservation schedule [{}] for guest [{}] ", createReservationRequestDTO.getScheduleId(), createReservationRequestDTO.getGuestId());
         return ResponseEntity.created(locationByEntity(reservationService.bookReservation(createReservationRequestDTO).getId())).build();
     }
@@ -39,7 +40,8 @@ public class ReservationController extends BaseRestController {
 
     @ApiOperation("Reschedule reservation")
     @GetMapping(value = "/reschedule", params = {"reservationId", "scheduleId"})
-    public ResponseEntity<ReservationDTO> rescheduleReservation(@RequestParam("reservationId") Long reservationId, @RequestParam("scheduleId") Long scheduleId) {
+    public ResponseEntity<ReservationDTO> rescheduleReservation(@RequestParam("reservationId") Long reservationId,
+                                                                @RequestParam("scheduleId") Long scheduleId) {
         log.info("[REST Reschedule reservation [{}] on schedule [{}]", reservationId, scheduleId);
         return ResponseEntity.ok(reservationService.rescheduleReservation(reservationId, scheduleId));
     }

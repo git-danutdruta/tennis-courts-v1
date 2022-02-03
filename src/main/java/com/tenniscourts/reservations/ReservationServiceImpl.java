@@ -1,6 +1,11 @@
 package com.tenniscourts.reservations;
 
+import com.tenniscourts.exceptions.AlreadyExistsEntityException;
 import com.tenniscourts.exceptions.EntityNotFoundException;
+import com.tenniscourts.guests.Guest;
+import com.tenniscourts.guests.GuestRepository;
+import com.tenniscourts.schedules.Schedule;
+import com.tenniscourts.schedules.ScheduleRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,14 +19,31 @@ import java.time.temporal.ChronoUnit;
 @Service
 @Transactional
 @AllArgsConstructor
-public class ReservationServiceImpl implements ReservationService{
+public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
-
+    private final GuestRepository guestRepository;
+    private final ScheduleRepository scheduleRepository;
     private final ReservationMapper reservationMapper;
 
     public ReservationDTO bookReservation(CreateReservationRequestDTO createReservationRequestDTO) {
-        throw new UnsupportedOperationException();
+        log.debug("[SERVICE] Book reservation");
+        Guest guest = guestRepository.findById(createReservationRequestDTO.getGuestId()).orElseThrow(() -> {
+            throw new EntityNotFoundException("Guest not found");
+        });
+        Schedule schedule = scheduleRepository.findById(createReservationRequestDTO.getScheduleId()).orElseThrow(() -> {
+            throw new EntityNotFoundException("Schedule not found");
+        });
+        if (reservationRepository.countByScheduleAndReservationStatus(schedule, ReservationStatus.READY_TO_PLAY) > 0) {
+            throw new AlreadyExistsEntityException("This schedule was book someone else. Please reconsider");
+        }
+        Reservation newReservation = Reservation.builder()
+                .guest(guest)
+                .schedule(schedule)
+                .value(BigDecimal.valueOf(10))
+                .reservationStatus(ReservationStatus.READY_TO_PLAY)
+                .build();
+        return reservationMapper.entityToDto(reservationRepository.save(newReservation));
     }
 
     public ReservationDTO findReservation(Long reservationId) {
@@ -69,12 +91,22 @@ public class ReservationServiceImpl implements ReservationService{
     }
 
     public BigDecimal getRefundValue(Reservation reservation) {
-        long hours = ChronoUnit.HOURS.between(LocalDateTime.now(), reservation.getSchedule().getStartDateTime());
+//        As a Tennis Court Admin, I want to keep
+//        25% of the reservation fee if the User cancels or reschedules between 12:00 and 23:59 hours in advance,
+//        50% between 2:00 and 11:59 in advance, and
+//        75% between 0:01 and 2:00 in advance
+        long minutes = ChronoUnit.MINUTES.between(LocalDateTime.now(), reservation.getSchedule().getStartDateTime());
 
-        if (hours >= 24) {
-            return reservation.getValue();
+        BigDecimal value = reservation.getValue();
+        if (minutes >= 1440) {
+            return value;
+        } else if (minutes >= 720) {
+            return new BigDecimal("0.25").multiply(value);
+        } else if (minutes >= 120) {
+            return new BigDecimal("0.50").multiply(value);
+        } else if (minutes >= 1) {
+            return new BigDecimal("0.75").multiply(value);
         }
-
         return BigDecimal.ZERO;
     }
 
