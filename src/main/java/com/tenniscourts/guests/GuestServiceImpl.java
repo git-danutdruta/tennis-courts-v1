@@ -36,6 +36,15 @@ public class GuestServiceImpl implements GuestService {
     }
 
     @Override
+    public void deleteGuest(Long guestId) {
+        log.debug("[SERVICE] Delete guest by id: [{}]", guestId);
+        Guest existingGuest = guestRepository.findById(guestId).orElseThrow(() -> {
+            throw new EntityNotFoundException("Guest not found");
+        });
+        guestRepository.delete(existingGuest);
+    }
+
+    @Override
     public List<GuestDTO> findAllGuest() {
         log.debug("[SERVICE] Find all guests");
         return guestMapper.entityToDto(guestRepository.findAll());

@@ -2,6 +2,7 @@ package com.tenniscourts.guests;
 
 
 import com.tenniscourts.config.BaseRestController;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 public class GuestController extends BaseRestController {
     private final GuestService guestService;
 
+    @ApiOperation("Register new guest")
     @PostMapping
     public ResponseEntity<Void> createGuest(@RequestBody GuestDTO newGuestDto) {
         log.info("[REST] Create new guest [{}]", newGuestDto.getName());
@@ -23,15 +25,18 @@ public class GuestController extends BaseRestController {
         return ResponseEntity.created(locationByEntity(guestService.createGuest(newGuestDto).getId())).build();
     }
 
+    @ApiOperation("Update existing guest")
     @PutMapping
     public ResponseEntity<GuestDTO> updateGuest(@RequestBody GuestDTO guestDTO) {
         log.info("[REST] Update guest [{}]", guestDTO.getId());
         return ResponseEntity.ok(guestService.updateGuest(guestDTO));
     }
 
+    @ApiOperation("Delete guest")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGuest(@PathVariable("id") Long guestId) {
         log.info("[REST] Delete guest");
+        guestService.deleteGuest(guestId);
         return ResponseEntity.noContent().build();
     }
 

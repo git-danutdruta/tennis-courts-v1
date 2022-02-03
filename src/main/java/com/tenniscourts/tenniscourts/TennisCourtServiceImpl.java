@@ -21,12 +21,13 @@ public class TennisCourtServiceImpl implements TennisCourtService {
     @Override
     public TennisCourtDTO addTennisCourt(TennisCourtDTO tennisCourt) {
         log.debug("[SERVICE] Add tennis court [{}]", tennisCourt.getName());
-        TennisCourt savedEntity = tennisCourtRepository.saveAndFlush(tennisCourtMapper.dtoToEntity(tennisCourt));
+        TennisCourt savedEntity = tennisCourtRepository.save(tennisCourtMapper.dtoToEntity(tennisCourt));
         return tennisCourtMapper.entityToDto(savedEntity);
     }
 
     @Override
     public TennisCourtDTO findTennisCourtById(Long id) {
+        log.debug("[SERVICE] Find tennis court by id [{}]", id);
         return tennisCourtRepository.findById(id)
                 .map(tennisCourtMapper::entityToDto)
                 .orElseThrow(() -> {

@@ -20,6 +20,13 @@ public interface GuestService {
     GuestDTO updateGuest(GuestDTO guestDto);
 
     /**
+     * Delete guest.
+     *
+     * @param guestId guest identifier.
+     */
+    void deleteGuest(Long guestId);
+
+    /**
      * Find guest by id.
      *
      * @param guestId guest identifier
