@@ -28,12 +28,10 @@ public class ReservationServiceImpl implements ReservationService {
 
     public ReservationDTO bookReservation(CreateReservationRequestDTO createReservationRequestDTO) {
         log.debug("[SERVICE] Book reservation");
-        Guest guest = guestRepository.findById(createReservationRequestDTO.getGuestId()).orElseThrow(() -> {
-            throw new EntityNotFoundException("Guest not found");
-        });
-        Schedule schedule = scheduleRepository.findById(createReservationRequestDTO.getScheduleId()).orElseThrow(() -> {
-            throw new EntityNotFoundException("Schedule not found");
-        });
+        Guest guest = guestRepository.findById(createReservationRequestDTO.getGuestId())
+                .orElseThrow(() -> new EntityNotFoundException("Guest not found"));
+        Schedule schedule = scheduleRepository.findById(createReservationRequestDTO.getScheduleId())
+                .orElseThrow(() -> new EntityNotFoundException("Schedule not found"));
         if (reservationRepository.countByScheduleAndReservationStatus(schedule, ReservationStatus.READY_TO_PLAY) > 0) {
             throw new AlreadyExistsEntityException("This schedule was book someone else. Please reconsider");
         }
@@ -50,9 +48,7 @@ public class ReservationServiceImpl implements ReservationService {
         log.debug("[SERVICE] Find reservation by id: [{}]", reservationId);
         return reservationRepository.findById(reservationId)
                 .map(reservationMapper::entityToDto)
-                .orElseThrow(() -> {
-                    throw new EntityNotFoundException("Reservation not found.");
-                });
+                .orElseThrow(() -> new EntityNotFoundException("Reservation not found."));
     }
 
     public ReservationDTO cancelReservation(Long reservationId) {
@@ -67,9 +63,7 @@ public class ReservationServiceImpl implements ReservationService {
             BigDecimal refundValue = getRefundValue(reservation);
             return this.updateReservation(reservation, refundValue, ReservationStatus.CANCELLED);
 
-        }).orElseThrow(() -> {
-            throw new EntityNotFoundException("Reservation not found.");
-        });
+        }).orElseThrow(() -> new EntityNotFoundException("Reservation not found."));
     }
 
     private Reservation updateReservation(Reservation reservation, BigDecimal refundValue, ReservationStatus status) {

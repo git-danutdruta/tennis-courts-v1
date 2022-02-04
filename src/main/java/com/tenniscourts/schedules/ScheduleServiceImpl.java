@@ -27,9 +27,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public ScheduleDTO addSchedule(CreateScheduleRequestDTO createScheduleRequestDTO) {
         log.debug("[SERVICE] Create schedule for tennis court [{}]", createScheduleRequestDTO.getTennisCourtId());
         TennisCourt tennisCourt = tennisCourtRepository.findById(createScheduleRequestDTO.getTennisCourtId())
-                .orElseThrow(() -> {
-                    throw new EntityNotFoundException("Can't schedule on non existing entity");
-                });
+                .orElseThrow(() -> new EntityNotFoundException("Can't schedule on non existing entity"));
         LocalDateTime startOfHour = createScheduleRequestDTO.getStartDateTime().withMinute(0);
         checkOverlappingSchedule(startOfHour, tennisCourt);
         Schedule transientSchedule = Schedule.builder()
@@ -59,9 +57,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         log.debug("[SERVICE] Find schedule by id: [{}]", scheduleId);
         return scheduleRepository.findById(scheduleId)
                 .map(scheduleMapper::entityToDto)
-                .orElseThrow(() -> {
-                    throw new EntityNotFoundException(String.format("Schedule [%d] not found", scheduleId));
-                });
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Schedule [%d] not found", scheduleId)));
     }
 
     @Override

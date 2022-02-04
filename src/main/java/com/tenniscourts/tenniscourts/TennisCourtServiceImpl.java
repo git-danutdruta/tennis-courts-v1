@@ -30,9 +30,7 @@ public class TennisCourtServiceImpl implements TennisCourtService {
         log.debug("[SERVICE] Find tennis court by id [{}]", id);
         return tennisCourtRepository.findById(id)
                 .map(tennisCourtMapper::entityToDto)
-                .orElseThrow(() -> {
-                    throw new EntityNotFoundException("Tennis Court not found.");
-                });
+                .orElseThrow(() -> new EntityNotFoundException("Tennis Court not found."));
     }
 
     @Override

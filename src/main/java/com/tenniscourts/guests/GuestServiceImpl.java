@@ -28,9 +28,7 @@ public class GuestServiceImpl implements GuestService {
     public GuestDTO updateGuest(GuestDTO guestDto) {
         Long guestId = guestDto.getId();
         log.debug("[SERVICE] Update guest [{}]", guestId);
-        Guest currentGuest = guestRepository.findById(guestId).orElseThrow(() -> {
-            throw new EntityNotFoundException(String.format("Guest [%d] not found", guestId));
-        });
+        Guest currentGuest = guestRepository.findById(guestId).orElseThrow(() -> new EntityNotFoundException(String.format("Guest [%d] not found", guestId)));
         currentGuest.setName(guestDto.getName());
         return guestMapper.entityToDto(guestRepository.save(currentGuest));
     }
@@ -38,9 +36,7 @@ public class GuestServiceImpl implements GuestService {
     @Override
     public void deleteGuest(Long guestId) {
         log.debug("[SERVICE] Delete guest by id: [{}]", guestId);
-        Guest existingGuest = guestRepository.findById(guestId).orElseThrow(() -> {
-            throw new EntityNotFoundException("Guest not found");
-        });
+        Guest existingGuest = guestRepository.findById(guestId).orElseThrow(() -> new EntityNotFoundException("Guest not found"));
         guestRepository.delete(existingGuest);
     }
 
@@ -55,9 +51,7 @@ public class GuestServiceImpl implements GuestService {
         log.debug("[SERVICE] Find guest by Id [{}]", guestId);
         return guestRepository.findById(guestId).
                 map(guestMapper::entityToDto)
-                .orElseThrow(() -> {
-                    throw new EntityNotFoundException("Guest not found");
-                });
+                .orElseThrow(() -> new EntityNotFoundException("Guest not found"));
     }
 
     @Override
